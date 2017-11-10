@@ -1,5 +1,9 @@
 ### Lab 1
-Celem zadania jest identyfikacja populacji komórek w korze mózgowej na podstawie profilu ekspresji genów (patrz wykład) oraz wybranie genów markerowych dla każdej populacji. 
+Celem zadania jest identyfikacja populacji komórek w korze mózgowej na podstawie profilu ekspresji genów (patrz wykład) oraz wybranie genów markerowych dla każdej populacji. Na zadanie będą poświęcone trzy laboratoria.
+
+1. Feature selection, redukcja wymiarowości
+2. Hierachiczna klasteryzacja, identyfikacja markerów
+3. Wizualizacja i omówienie wyników
 
 Należy poklasyfikować komórki według i wzorca ekspresji. Zbiór danych dotyczy >1800 komórek nerwowych i ich trankryptomów (> 20000 genów każdy).
 
@@ -15,5 +19,32 @@ Publikacja znajduje się pod adresem https://www.ncbi.nlm.nih.gov/pubmed/2672754
 
 # 3
 `podejrzeć plik`
+Można wykorzystać cat, head, cut, gzip -d, gunzip
 
-W pierwszym kroku należy zredukować ilość wymiarów (ktorych początkowo jest tyle ile jest genów) przy pomocy analizy komponentów głównych. W kolejnym kroku odlożyć komórki według opisu na pierwszych dwóch osiach PCA. Można wybrać klastry komórek i dalej je różnicować. Ostatecznie powinno powstać 20-60 populacji komórek. Należy je nazwać i zwizualizować oraz poklastrować. Można używać także hierarchicznej klasteryzacji lub k-means.
+# 4
+`wczytać plik`
+R funkcja read.csv
+
+# 5
+`policzyć średnią z każdego wiersza`
+Wykorzystać apply zamiast for. W domu przeczytać dlaczego w R korzystamy z apply.
+
+# 6
+`policzyć decyle, średnią, medianę, kwartyle z każdego wiersza`
+Można wykorzystać funckje summary dla wektorów liczbowych oraz quantile
+
+# 7
+`obejrzec rozkłady średnich, median, różnic między kwartylami`
+Wykorzystać funckję hist. Rozkłady skośne można oglądać wykorzystując transformację log(1 + x)
+
+# 8
+`wykonać redukcję wymiarów przy pomocy PCA dla pierwszych 300 genów`
+wykorzystać funkcję prcomp
+
+# 9
+`przedstawić na wykresie typu scatterplot rozłożenie próbek na dwóch pierwszych osiach PCA1 i PCA2`
+funckja plot
+
+# 10
+`przefiltrować features na podstawie rozkładu i powtórzyć kroki 8 i 9 aż do uzyskania rozdzielonych "chmurek"`
+można wykorzystać funcję which
