@@ -13,48 +13,66 @@ Publikacja znajduje się pod adresem https://www.ncbi.nlm.nih.gov/pubmed/2672754
 
 ## 1
 ```
-otworzyć rstudio
+otworzyć rstudio i utworzyć nowy projekt
 ```
 
 # 2
-`pobrać plik`
+```
+pobrać plik
+```
 
 # 3
-`podejrzeć plik`
+```
+podejrzeć plik
+```
 
 Można wykorzystać `cat`, `head`, `cut`, `gzip -d`, `gunzip`
 
 # 4
-`wczytać plik`
+```
+wczytać plik
+```
 
 R. Funkcja `read.csv`
 
 # 5
-`policzyć średnią z każdego wiersza`
+```
+policzyć średnią z każdego wiersza
+```
 
 Wykorzystać `apply` zamiast `for`. W domu przeczytać dlaczego w R korzystamy z `apply`.
 
 # 6
-`policzyć decyle, średnią, medianę, kwartyle z każdego wiersza`
+```
+policzyć decyle, średnią, medianę, kwartyle z każdego wiersza
+```
 
 Można wykorzystać funckję `summary` dla wektorów liczbowych oraz funckję `quantile`
 
 # 7
-`obejrzec rozkłady średnich, median, różnic między kwartylami`
+```
+obejrzec rozkłady średnich, median, różnic między kwartylami
+```
 
 Wykorzystać funckję `hist`. Rozkłady skośne można oglądać wykorzystując transformację `log2(1 + x)`
 
 # 8
-`wykonać redukcję wymiarów przy pomocy PCA dla pierwszych 300 genów`
+```
+wykonać redukcję wymiarów przy pomocy PCA dla pierwszych 300 genów
+```
 
 Wykorzystać funkcję `prcomp`
 
 # 9
-`przedstawić na wykresie typu scatterplot rozłożenie próbek na dwóch pierwszych osiach PCA1 i PCA2`
+```
+przedstawić na wykresie typu scatterplot rozłożenie próbek na dwóch pierwszych osiach PCA1 i PCA2
+```
 
 Funckja `plot`
 
 # 10
-`przefiltrować features na podstawie rozkładu i powtórzyć kroki 8 i 9 aż do uzyskania rozdzielonych "chmurek"`
+```
+przefiltrować features na podstawie rozkładu i powtórzyć kroki 8 i 9 aż do uzyskania rozdzielonych "chmurek"
+```
 
 Można wykorzystać funcję `which`
