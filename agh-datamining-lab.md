@@ -1,8 +1,8 @@
 # Spis treści
-1. [Lab 1](# Lab 1)
-2. [Lab 2](# Lab 2)
+1. [Lab 1](#Lab1)
+2. [Lab 2](#Lab2)
 
-# Lab 1
+# Lab1
 Celem zadania jest identyfikacja populacji komórek w korze mózgowej na podstawie profilu ekspresji genów (patrz wykład) oraz wybranie genów markerowych dla każdej populacji. Na zadanie będą poświęcone trzy laboratoria.
 
 1. Feature selection, redukcja wymiarowości
