@@ -80,3 +80,6 @@ przefiltrować features na podstawie rozkładu i powtórzyć kroki 8 i 9 aż do 
 ```
 
 Można wykorzystać funcję `which`
+
+# Lab2
+Tadam
