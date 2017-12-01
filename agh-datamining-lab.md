@@ -3,6 +3,7 @@
 ## Spis treści
 1. [Lab 1](#lab1) 10.11.2017
 2. [Lab 2](#lab2) 17.11.2017
+3. [Lab 3](#lab3) 1.12.2017
 
 ## Lab1
 Celem zadania jest identyfikacja populacji komórek w korze mózgowej na podstawie profilu ekspresji genów (patrz wykład) oraz wybranie genów markerowych dla każdej populacji. Na zadanie będą poświęcone trzy laboratoria.
@@ -168,3 +169,112 @@ Usunąć komórki źle sklasyfikowane przez marker - można przypisać im klasę
 Na wydzielonych klasach powtórzyć iteracyjnie procedurę, aż do momentu, w którym nie da się znaleźc markera dla żadnej z gałęzi.
 ```
 Opisać komórki klasami
+
+Kod
+```
+url <- "http://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE71585&format=file&file=GSE71585%5FRefSeq%5FRPKM%2Ecsv%2Egz"
+file <- "rpkm.csv.gz"
+download.file(url,file)
+data <- read.csv(
+  gzfile(file),
+  sep=",",
+  header=TRUE,
+  stringsAsFactors=FALSE,
+  row.names=1)
+colnames(data) <- 1:ncol(data)
+
+MIN_CLUSTER_COUNT = 10
+
+mergeVectors <- function(x) {
+  apply(x, 1, function(y) {
+    wh <- which(y != "-")
+    if(length(wh) == 0) {return("-")}
+    return(y[wh])
+  })
+}
+
+score <- function(x, cutree, clusternum = 1) {
+  x <- as.numeric(x)
+  division <- (table(cutree))[3 - clusternum]
+  threshold <- sort(x)[division]
+  threshold
+  sum(x[cutree == clusternum] > threshold) + sum(x[cutree == (3 - clusternum)] <= threshold)
+}
+
+
+getCellIndexes <- function(x, cutree, clusternum = 1) {
+  out <- cutree
+  x <- as.numeric(x)
+  division <- (table(cutree))[3 - clusternum]
+  threshold <- sort(x)[division]
+  which(cutree == clusternum & x > threshold)
+}
+
+analyse <- function(which.columns, name = "-") {
+  selected.data <- data[,which.columns]
+  selected.desc <- data.frame(
+                      t(apply(selected.data, 1, summary)),
+                      t(apply(selected.data, 1, quantile, prob = seq(0, 1, length = 11)))
+                      )
+  which.rows <- which(selected.desc$Min < 0.5 & selected.desc$Max < 500 & selected.desc$X20. < 1 & selected.desc$X80. > 30)
+  print("Computing PCA...")
+  pca <- prcomp(t(selected.data[which.rows,]))
+  print("Plotting PCA...")
+  plot(pca$x[,1:2])
+  print("Clustering...")
+  dist <- dist(pca$x[,1:2])
+  hc <- hclust(dist, method = 'average')
+  dend <- as.dendrogram(hc)
+  print("Plotting heatmap...")
+  heatmap(as.matrix(dist), Rowv = dend, Colv = dend)
+  cutree <- (cutree(hc, k = 2))
+  if(min(table(cutree)) < MIN_CLUSTER_COUNT) {
+    out <- rep("-", ncol(data))
+    indexOfBiggerCluster = order(table(cutree))[2]
+    out[which.columns[cutree == indexOfBiggerCluster]] <- name
+    return(out)
+  }
+  print("Scoring genes...")
+  scores_one <- apply(selected.data, 1, score, cutree = cutree, clusternum = 1)
+  print("Scoring genes...")
+  scores_two <- apply(selected.data, 1, score, cutree = cutree, clusternum = 2)
+  print("Sorting...")
+  gene1id = order(scores_one, decreasing = T)[1]
+  gene1name = rownames(data)[gene1id]
+  gene2id = order(scores_two, decreasing = T)[1]
+  gene2name = rownames(data)[gene2id]
+  plot(1:ncol(selected.data),selected.data[gene1id,hc$order])
+  plot(1:ncol(selected.data),selected.data[gene2id,hc$order])
+  out <- rep("-", ncol(data))
+  out[which.columns[getCellIndexes(selected.data[gene1id,], cutree, 1)]] <- gene1name
+  out[which.columns[getCellIndexes(selected.data[gene2id,], cutree, 2)]] <- gene2name
+  out
+}
+
+markers <- matrix(data = "-", nrow = 25, ncol = ncol(data))
+markers[1,] <- analyse(1:ncol(data))
+for(i in 1:25) {
+  genes <- names(table(markers[i - 1,]))[table(markers[i - 1,]) > 10]
+  genes <- genes[genes != "-"]
+  markers[i,] <- mergeVectors(
+    sapply(genes, function(x) {analyse(which(markers[i - 1,] == x), name = x)})
+  )
+}
+
+```
+
+## Lab3
+Kod do Lab 3
+```
+url <- "http://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE71585&format=file&file=GSE71585%5FRefSeq%5FRPKM%2Ecsv%2Egz"
+file <- "rpkm.csv.gz"
+download.file(url,file)
+data <- read.csv(
+  gzfile(file),
+  sep=",",
+  header=TRUE,
+  stringsAsFactors=FALSE,
+  row.names=1)
+colnames(data) <- 1:ncol(data)
+load(url("https://github.com/marpiech/bioinfo-recipes/raw/master/markers.RData"))
+```
