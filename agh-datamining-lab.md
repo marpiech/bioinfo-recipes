@@ -278,3 +278,39 @@ data <- read.csv(
 colnames(data) <- 1:ncol(data)
 load(url("https://github.com/marpiech/bioinfo-recipes/raw/master/markers.RData"))
 ```
+### 1
+Zapoznać się z macierzą `markers`
+### 2
+Do dalszej pracy wybieramy 6 markerów
+```
+which.genes <- c("Snap25", "Slc6a1", "Synpr", "Satb2", "Qk", "Sept4")`
+```
+### 3
+Wybrać odpowiednie numery wierszy w macierzy `data` na podstawie nazw markerów
+
+### 4
+Obliczyć macierz odległości na podstawie korelacji. Wykorzystać funkcję `cor`. Miejsca zawierające wartości `NA` uzupełnić jako zerowa korelacja.
+
+Pytanie pomocnicze: czy wysoka korelacja oznacza małą czy dużą odległość pomiędzy wektorami?
+
+### 5
+
+Posortować kolumny w macierzy według hierarchicznej klasteryzacji
+
+Uwaga: jeśli nie zmienimy na tym etapie nazw kolumn zostaną one posortowane alfanumerycznie i podczas wizualizacji ggplot nasze sortowanie zostanie odwrócone.
+
+### 6
+
+Macierz przetransformować na postać normalną do `data.frame`. Funkcja `melt`
+
+### 7
+
+Poziomy kespresji wybranych genów przedstawić na wykresie słupkowym.
+Funkcja `ggplot`. Rodzaj wykresu `geom_bar`. Każdy gen powinien znaleźć się na osobnym panelu. Wykorzystać do tego `facet_wrap`
+
+### 8
+
+Procedurę wykonać dla innych zestawów markerów
+
+### 9
+Na wykresie pca z Lab1 przedstawić dowolny marker
