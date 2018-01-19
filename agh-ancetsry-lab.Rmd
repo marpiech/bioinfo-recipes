@@ -1,0 +1,104 @@
+---
+title: "Ancestry (agh lab) Notebook"
+output: html_notebook
+---
+
+#Analiza pochodzenia ludzi na podstawie genotypowania wybranych nukleotydów
+
+###Przygotowanie danych
+```{bash}
+cat ref.vcf | grep -v "##" | cut -f 3,10- | sed 's|\./\.|NA|g' | sed 's|0/0|0|g' | sed 's|0/1|1|g' | sed 's|1/1|2|g' | sed 's|[a-Z0-9]*_||g' > encoded
+```
+
+###Wczytanie danych
+```{r}
+data <- read.table("encoded", header = T, row.names = 1, colClasses = c("character", rep("factor", 3970)))
+```
+
+###Podglad danych
+```{r}
+data[1:5,1:5]
+```
+###Wczytanie opisu próbek
+```{r}
+sample_info <- read.table("population", row.names = 3, sep = ",")
+```
+
+###Podglad opisu probek
+```{r}
+head(sample_info)
+```
+###Usuniecie probek bez opisu i dopasowanie
+```{r}
+samples_to_remove <- which(is.na(match(colnames(data), rownames(sample_info))))
+data <- data[,-samples_to_remove]
+sample_info <- sample_info[match(colnames(data), rownames(sample_info)),]
+```
+###Ponowny podglad opisu probek
+```{r}
+head(sample_info)
+```
+###Przeksztalcenie danych do postaci numerycznych i podstawienie brakujacych wynikow
+```{r}
+data_numeric <- as.matrix(data)
+class(data_numeric) <- "numeric"
+data_numeric[is.na(data_numeric)] <- 1
+```
+###Wybor cech na podstawie statystyki
+```{r}
+filter_p <- apply(data_numeric, 1, function(x) {
+summary(aov(x ~ sample_info$V5))[[1]]$'Pr(>F)'[1]
+})
+```
+
+###Wybor zbioru uczacego i testowego
+```{r}
+sample <- sample(1:ncol(data))
+train_set <- sample[1:2000]
+test_set <- sample[2001:ncol(data)]
+```
+
+###PCA
+```{r}
+pca <- prcomp(t(data_numeric[order(filter_p)[1:100],train_set]))
+plot(pca$x[,"PC1"], pca$x[,"PC2"])
+```
+
+###PCA przy pomocy ggplot
+```{r}
+require(magrittr)
+require(ggplot2)
+require(dplyr)
+data.frame(pca1 = pca$x[,"PC1"], pca2 = pca$x[,"PC2"], pop = sample_info$V5[train_set]) %>%
+  {ggplot(aes(x = pca1, y = pca2, colour = as.factor(pop)), data = .) + geom_point()}
+```
+
+###Wizualizacja wybranej populacji
+```{r}
+data.frame(pca1 = pca$x[,"PC1"], pca2 = pca$x[,"PC2"], pop = sample_info$V5[train_set]) %>% 
+  mutate(europe=replace(pop, pop!="europe", "not-europe")) %>%
+  {ggplot(aes(x = pca1, y = pca2, colour = as.factor(europe)), data = .) + geom_point()}
+```
+
+###Budowa modelu naive.bayes
+```{r}
+require("e1071")
+nb <- naiveBayes(pop ~ ., data = data.frame(t(data[order(filter_p)[1:100],train_set]), pop = sample_info$V5[train_set]))
+```
+
+###Predykcja
+```{r}
+pred <- predict(nb, data.frame(t(data[order(filter_p)[1:100],test_set])))
+```
+
+###Wizualizacja trafnosci predykcji
+```{r}
+heatmap(table(pred, sample_info$V5[test_set]), Rowv = NA, Colv = NA)
+```
+
+###Prawdopodobienstwo predykcji
+```{r}
+pred <- predict(nb, data.frame(t(data[order(filter_p)[1:100],test_set])), type = "raw")
+apply(head(pred)*100,2,as.integer)
+```
+
